@@ -1,4 +1,4 @@
-#Case Management API (MongoDB + Node.js)
+# Case Management API (MongoDB + Node.js)
 
 This is a RESTful API built with **Node.js**, **Express**, and **MongoDB (Atlas)**.  
 It provides basic CRUD functionality for managing cases and users.  
