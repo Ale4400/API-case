@@ -6,18 +6,15 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
 app.use(express.json());
 
-// Conexión a MongoDB Atlas (quita las opciones deprecated)
-mongoose.connect(process.env.MONGODB_URI)  // Removí useNewUrlParser y useUnifiedTopology
-  .then(() => console.log('✅ Conectado a MongoDB Atlas'))
+mongoose.connect(process.env.MONGODB_URI) 
+  .then(() => console.log('Conectado a MongoDB Atlas'))
   .catch(err => {
-    console.error('❌ Error de conexión a MongoDB:', err);
-    process.exit(1);  // Sale del proceso si DB falla al inicio
+    console.error('Error de conexión a MongoDB:', err);
+    process.exit(1);  
   });
 
-// Esquema y modelo de usuario (OK)
 const usuarioSchema = new mongoose.Schema({
   usuario: { type: String, required: true, unique: true },
   contrasena: { type: String, required: true }
@@ -25,16 +22,14 @@ const usuarioSchema = new mongoose.Schema({
 
 const Usuario = mongoose.model('Usuario', usuarioSchema);
 
-// Ruta base para comprobar el servidor (OK)
 app.get('/', (req, res) => {
   res.send('🚀 Servidor funcionando correctamente');
 });
 
-// Registro de usuario (agrega más logging en catch)
 app.post('/register', async (req, res) => {
   try {
     const { usuario, contrasena } = req.body;
-    console.log('📥 Request body en /register:', req.body);  // Debug: ve qué llega
+    console.log('📥 Request body en /register:', req.body); 
 
     if (!usuario || !contrasena) {
       return res.status(400).json({ error: 'Usuario y contraseña son requeridos' });
@@ -60,20 +55,19 @@ app.post('/register', async (req, res) => {
     console.error('🚨 Error detallado en /register:', {
       message: error.message,
       stack: error.stack,
-      name: error.name  // Ej. "MongoError", "ValidationError"
+      name: error.name  
     });
     res.status(500).json({ 
       error: 'Error interno del servidor', 
-      details: error.message  // Temporal: muestra en respuesta para debug (quita en prod)
+      details: error.message  
     });
   }
 });
 
-// Inicio de sesión (mismo logging)
 app.post('/login', async (req, res) => {
   try {
     const { usuario, contrasena } = req.body;
-    console.log('📥 Request body en /login:', req.body);  // Debug
+    console.log('📥 Request body en /login:', req.body);  
 
     if (!usuario || !contrasena) {
       return res.status(400).json({ error: 'Usuario y contraseña son requeridos' });
@@ -98,12 +92,11 @@ app.post('/login', async (req, res) => {
     });
     res.status(500).json({ 
       error: 'Error interno del servidor', 
-      details: error.message  // Temporal para debug
+      details: error.message  
     });
   }
 });
 
-// 🟢 Middleware de errores GLOBAL (agrega esto NUEVO al final, antes de app.listen)
 app.use((err, req, res, next) => {
   console.error('🚨 ERROR GLOBAL 500:', {
     message: err.message,
@@ -114,7 +107,7 @@ app.use((err, req, res, next) => {
   });
   res.status(500).json({ 
     error: 'Error interno del servidor', 
-    details: process.env.NODE_ENV === 'development' ? err.message : 'Detalles ocultos'  // Solo en dev
+    details: process.env.NODE_ENV === 'development' ? err.message : 'Detalles ocultos'  
   });
 });
 
